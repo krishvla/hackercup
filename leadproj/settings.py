@@ -82,9 +82,9 @@ DATABASES = {
         'ENGINE': 'djongo',
         "CLIENT":{
             'name': 'codas',
-            'host': 'mongodb+srv://user1:user1@cluster0.i5hvn.mongodb.net/codas?retryWrites=true&w=majority',
+            'host': 'mongodb+srv://krish:xxxxxxx@cluster0.i5hvn.mongodb.net/codas?retryWrites=true&w=majority',
             'username': 'krish',
-            'password': '8121',
+            'password': 'xxxxxx',
             "authMechanism": "SCRAM-SHA-1",
         },
     }
