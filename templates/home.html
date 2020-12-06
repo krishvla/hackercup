@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+    <title>Home</title>
+    <style>
+        body{
+            background: linear-gradient(to right, #25c481, #25b7c4);
+        }
+        
+    #message_toasts{
+        z-index: 99 !important;
+    }
+
+    .toast{
+        border-radius: 5px !important;
+        margin-right: 20px;
+    }
+    .toast-body{
+        max-width: 350px;
+    }
+    #messages {
+        z-index: 99 !important;
+        position: fixed;
+        top: 20px;
+        left: 0;
+        width: 100%;
+        height: auto;
+    }
+    #toast_head{
+        text-align: center !important;
+    }
+    #edit_modal_title{
+        margin-left: 30%;
+    }
+    .toast .toast-header.alert_success{
+        background-color: seagreen;
+    }
+    .toast .toast-header.alert_info{
+        background-color: rgba(0, 119, 255, 0.877) !important;
+    }
+    .toast .toast-header.alert_error{
+        background-color: tomato;
+    }
+    #leadtable, table.dataTable tbody tr {
+        background: transparent;
+    }
+    table.table tbody tr td:first-child{
+        cursor: pointer;
+    }
+    table.table> tbody > tr:first-child{
+        /* background: rgba(255,255,255,0.3); */
+        
+    }
+    .table td, .table th{
+        border: none;
+    }
+    .container .card{
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="accordion" id="mycollapse">
+            <div class="card">
+              <div class="card-header" id="headingOne">
+                <h2 class="mb-0">
+                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add_team_collapse" aria-expanded="true" aria-controls="collapseOne">
+                    Add Team Form
+                  </button>
+                </h2>
+              </div>
+          
+              <div id="add_team_collapse" class="collapse" aria-labelledby="headingOne" data-parent="#mycollapse">
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="input_team_name" class="col-sm-3 col-form-label">Team name: </label>
+                        <div class="col-sm-9">
+                          <input type="text" class="form-control" id="input_team_name" placeholder="WeArehacker,..">
+                        </div>
+                      </div>
+                      <button type="button" class="btn btn-outline-primary" onClick='addTeam()'><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>Add Team</button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" id="headingTwo">
+                <h2 class="mb-0">
+                  <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Add Match Scoring
+                  </button>
+                </h2>
+              </div>
+              <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#mycollapse">
+                <div class="card-body">
+                  <div class="container">
+                      <div class="row-help">
+                          <h4>Selected Teams: </h4>
+                          <p><sup>*</sup>Please select teams from below table and drag the bar to choose who is the winner</p>
+                      </div>
+                        <div class="row">
+                            <div class="form-check">
+                                <span class="badge badge-pill badge-info" id="selected_team_1">Select Team 1</span>
+                            </div>
+                            &nbsp;&nbsp;
+                            <div class="form-group">
+                                <input type="range" class="custom-range" min="0" max="2" id="whowins" disabled>
+                            </div>
+                            &nbsp;&nbsp;
+                            <div class="form-check">
+                                <span class="badge badge-pill badge-info" id="selected_team_2">Select Team 2</span>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <button type="button" class="btn btn-info" onclick='send_winner()' id="submit_score_btn" disabled><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>&nbsp; Submit Winner</button>
+                            &nbsp;&nbsp;
+                            <button type="button" class="btn btn-danger" onclick='clear_win_data()' ><i class="fa fa-times" aria-hidden="true"></i>&nbsp; Clear data</button>
+                        </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+    <br>
+    <div class="container">
+        <table class="table table-hover" id='leadtable'>
+            <thead>
+              <tr>
+                <th scope="col">Team Name</th>
+                <th scope="col">Wins</th>
+                <th scope="col">Losses</th>
+                <th scope="col">Ties</th>
+                <th scope="col">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    <tr>
+                        <td>{{ team.team_name }}</td>
+                        <td>{{ team.wins }}</td>
+                        <td>{{ team.losses }}</td>
+                        <td>{{ team.ties }}</td>
+                        <td>{{ team.score }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+ <!-- Message Toasts -->
+
+<div id="messages">
+    <div aria-live="polite" id="message_toasts" aria-atomic="true" style="position: relative">
+      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 0; right: 0;">
+        <div class="toast-header">
+          <strong class="mr-auto" id="toast_head">Success</strong>
+          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="toast-body">
+          <p id="toast_message">
+            
+          </p>
+        </div>
+      </div>
+    </div>
+</div>
+</body>
+<script>
+    var table = document.getElementById("leadtable");
+    var myDataTable;
+    let team1='', team2='', index_team1='', index_team2='';
+    var elements = {
+        'toast_head' : document.getElementById('toast_head'),
+        'toast_message' :document.getElementById('toast_message'),
+        'selected_team_1': document.getElementById('selected_team_1'),
+        'selected_team_2': document.getElementById('selected_team_2'),
+        'whowins': document.getElementById('whowins'),
+        'submit_score_btn': document.getElementById('submit_score_btn'),
+    }
+
+    $(document).ready(function () {
+        myDataTable = $('#leadtable').DataTable({
+            "paging": true,
+            "pagingType": "simple",
+            "order": [[ 4, "desc" ]]
+        });
+        $('.dataTables_length').addClass('bs-select');
+    });
+    $('#leadtable').on('click', 'tbody tr', function () {
+        let curr_data = myDataTable.row($(this)).data();
+        let curr_index = myDataTable.row($(this)).index();
+        let choosed_team_name = curr_data[0];
+        if(team1 == ''){
+            elements['selected_team_1'].innerHTML = choosed_team_name;
+            $('#collapseTwo').collapse('show');
+            team1 = choosed_team_name;
+            index_team1 = curr_index;
+        }
+        else if(team1 != '' && team2 == ''){
+            elements['selected_team_2'].innerHTML = choosed_team_name;
+            $('#collapseTwo').collapse('show');
+            team2 = choosed_team_name;
+            index_team2 = curr_index;
+            elements['whowins'].disabled = false;
+            elements['submit_score_btn'].disabled = false;
+        }
+        console.log(team1, team2);
+    });
+
+    function clear_win_data(){
+        team1 = '';
+        team2 = '';
+        elements['selected_team_1'].innerHTML ="Select Team 1";
+        elements['selected_team_2'].innerHTML ="Select Team 2";
+        elements['whowins'].disabled = true;
+        elements['submit_score_btn'].disabled = true;
+
+    }
+    function getCookie(name) {
+        let cookieValue = null;
+       if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function addTeam(){
+        let team_name = document.getElementById('input_team_name').value;
+        if (team_name != "") {
+            let form_data = new FormData(); 
+            let csrftoken = getCookie('csrftoken'); // Getting CSRF Token
+            form_data.append('csrfmiddlewaretoken', csrftoken);
+            form_data.append('team_name', team_name);
+            var ajax_req = new XMLHttpRequest(); //AJAX Request
+            ajax_req.open("POST", "/ajax/add_team/", true);
+            ajax_req.onload = function (eve) {
+                let response = JSON.parse(ajax_req.response);
+                if (response['status'] == 200) {
+                    get_message("Success" , 'green' , response['Message']);
+                    old_data = myDataTable.rows().data();
+                    old_data.push([team_name, '0', '0', '0', '0']);
+                    myDataTable.clear();
+                    myDataTable.rows.add(old_data);
+                    myDataTable.draw();
+                    $('#add_team_modal').modal('hide');
+                }
+                else {
+                    get_message("Error" , 'tomato' , response['Message']);
+                    $('#add_team_modal').modal('hide');
+                    console.log("WRONg!! happen");
+                }
+            };
+            ajax_req.send(form_data);
+
+        }
+        else {
+            console.log("The form is empty");
+        }
+    }
+
+    function send_winner(){
+        let selected_winning_range = elements['whowins'].value;
+        let winner = 'tie';
+        if(selected_winning_range == 0){
+            winner = team1;
+        }
+        else if(selected_winning_range == 2){
+            winner = team2;
+        }
+        let form_data = new FormData(); 
+        let csrftoken = getCookie('csrftoken'); // Getting CSRF Token
+        form_data.append('csrfmiddlewaretoken', csrftoken);
+        form_data.append('winner', winner);
+        form_data.append('team1', team1);
+        form_data.append('team2', team2);
+        var ajax_req = new XMLHttpRequest(); //AJAX Request
+        ajax_req.open("POST", "/ajax/match_win/", true);
+        ajax_req.onload = function (eve) {
+            let response = JSON.parse(ajax_req.response);
+            if (response['status'] == 200) {
+                get_message("Success" , 'green' , response['Message']);
+                old_data = myDataTable.rows().data();   
+                if(winner == 'tie'){
+                    old_data[index_team1][3] = (parseInt(old_data[index_team1][3]) + 1).toString();
+                    old_data[index_team2][3] = (parseInt(old_data[index_team2][3]) + 1).toString();
+
+                    old_data[index_team1][4] = (parseInt(old_data[index_team1][4]) + 1).toString();
+                    old_data[index_team2][4] = (parseInt(old_data[index_team2][4]) + 1).toString();
+                }
+                else{
+                    if(winner == team1){
+                        old_data[index_team1][1] = (parseInt(old_data[index_team1][1]) + 1).toString();
+                        old_data[index_team2][2] = (parseInt(old_data[index_team2][2]) + 1).toString();
+
+                        old_data[index_team1][4] = (parseInt(old_data[index_team1][4]) + 3).toString();
+
+                    }
+                    else{
+                        old_data[index_team2][1] = (parseInt(old_data[index_team2][1]) + 1).toString();
+                        old_data[index_team1][2] = (parseInt(old_data[index_team1][2]) + 1).toString();
+
+                        old_data[index_team2][4] = (parseInt(old_data[index_team2][4]) + 3).toString();
+                    }
+                }
+                myDataTable.clear();
+                myDataTable.rows.add(old_data);
+                myDataTable.draw();
+            }
+            else {
+                get_message("Error" , 'tomato' , response['Message']);
+                console.log("WRONg!! happen");
+            }
+        };
+        ajax_req.send(form_data);
+        
+    }
+    
+function get_message(type , color , message) {
+      /**
+     * This function is for create the property form which takes 5 parameters type, id_array, array_level, property_types, data_type
+     * type : this parameter stands for type of message
+     * color : this parameter stands for color of box
+     * message : this parameter stands for message
+     * Return Type : it doesnt return anything
+     */
+    $('#edit_modal').modal('hide');
+    elements['toast_head'].innerHTML = type;
+    elements['toast_head'].style.color = color;
+    elements['toast_message'].innerHTML = `Message: ${message}`;
+    $('.toast').toast({
+        delay: 5000,
+    })
+    $('.toast').toast('show');
+}
+</script>
+</html>
